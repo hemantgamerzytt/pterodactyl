@@ -1,0 +1,122 @@
+#!/bin/bash
+set -e
+
+######################################################################################
+#                                                                                    #
+# Project 'pterodactyl-installer' (Custom Edition)                                   #
+# Custom Branding by HemantGamerzYT                                                  #
+# Blue & White Theme                                                                 #
+######################################################################################
+
+export GITHUB_SOURCE="v1.2.0"
+export SCRIPT_RELEASE="v1.2.0"
+export GITHUB_BASE_URL="https://raw.githubusercontent.com/pterodactyl-installer/pterodactyl-installer"
+
+LOG_PATH="/var/log/pterodactyl-installer.log"
+
+# Colors: Blue & White Theme
+WHITE='\033[1;37m'
+BLUE='\033[1;34m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Custom terminal banner
+clear
+echo -e "${BLUE}╔══════════════════════════════════════════════════════╗${RESET}"
+echo -e "${BLUE}║${WHITE}             🌐 VPS INSTALLER - HemantGamerzYT            ${BLUE}║${RESET}"
+echo -e "${BLUE}║${WHITE}        Custom Blue & White Pterodactyl Installer        ${BLUE}║${RESET}"
+echo -e "${BLUE}╚══════════════════════════════════════════════════════╝${RESET}"
+echo
+
+# Check for curl
+if ! [ -x "$(command -v curl)" ]; then
+  echo -e "${BLUE}*${RESET} ${WHITE}curl is required. Please install it first.${RESET}"
+  echo -e "${BLUE}*${RESET} ${WHITE}Run: sudo apt install curl -y${RESET}"
+  exit 1
+fi
+
+# Always remove lib.sh, before downloading it
+[ -f /tmp/lib.sh ] && rm -rf /tmp/lib.sh
+curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL"/master/lib/lib.sh
+source /tmp/lib.sh
+
+# Custom output functions with colors
+output() {
+  echo -e "${BLUE}[*]${RESET} ${WHITE}$1${RESET}"
+}
+
+error() {
+  echo -e "${BLUE}[!]${RESET} ${WHITE}Error:${RESET} $1"
+}
+
+welcome() {
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+  echo -e "${WHITE} Welcome to the Pterodactyl Installer by ${BLUE}HemantGamerzYT ${RESET}"
+  echo -e "${WHITE} Version: ${BLUE}${SCRIPT_RELEASE}${RESET}"
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+}
+
+execute() {
+  echo -e "\n\n* pterodactyl-installer $(date) \n\n" >>$LOG_PATH
+  [[ "$1" == *"canary"* ]] && export GITHUB_SOURCE="master" && export SCRIPT_RELEASE="canary"
+  update_lib_source
+  run_ui "${1//_canary/}" |& tee -a $LOG_PATH
+
+  if [[ -n $2 ]]; then
+    echo -e -n "${BLUE}*${RESET} ${WHITE}Installation of $1 completed. Proceed to $2? (y/N): ${RESET}"
+    read -r CONFIRM
+    if [[ "$CONFIRM" =~ [Yy] ]]; then
+      execute "$2"
+    else
+      error "Installation of $2 aborted."
+      exit 1
+    fi
+  fi
+}
+
+welcome ""
+
+done=false
+while [ "$done" == false ]; do
+  options=(
+    "Install the panel"
+    "Install Wings"
+    "Install both [0] and [1] on the same machine"
+    "Install panel (Canary)"
+    "Install Wings (Canary)"
+    "Install both (Canary)"
+    "Uninstall (Canary)"
+  )
+
+  actions=(
+    "panel"
+    "wings"
+    "panel;wings"
+    "panel_canary"
+    "wings_canary"
+    "panel_canary;wings_canary"
+    "uninstall_canary"
+  )
+
+  output "What would you like to do?"
+  for i in "${!options[@]}"; do
+    echo -e "${BLUE}[$i]${RESET} ${WHITE}${options[$i]}${RESET}"
+  done
+
+  echo -ne "${BLUE}*${RESET} ${WHITE}Select option (0-${#actions[@]}): ${RESET}"
+  read -r action
+
+  [ -z "$action" ] && error "Input required" && continue
+
+  valid_input=("$(for ((i = 0; i <= ${#actions[@]} - 1; i += 1)); do echo "${i}"; done)")
+  [[ ! " ${valid_input[*]} " =~ ${action} ]] && error "Invalid option" && continue
+
+  done=true
+  IFS=";" read -r i1 i2 <<<"${actions[$action]}"
+  execute "$i1" "$i2"
+done
+
+# Cleanup
+rm -rf /tmp/lib.sh
+
+echo -e "\n${BLUE}✔${RESET} ${WHITE}All done! Thank you for using ${BLUE}HemantGamerzYT Installer${RESET}\n"
