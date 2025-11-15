@@ -2,10 +2,7 @@
 set -e
 
 ######################################################################################
-#                                                                                    #
-# Project 'pterodactyl-installer' (Custom Edition)                                   #
-# Custom Branding by HemantGamerzYT                                                  #
-# Blue & White Theme                                                                 #
+#                                  HemantGamerzYT                                    #                                                     #
 ######################################################################################
 
 export GITHUB_SOURCE="v1.2.0"
@@ -23,8 +20,8 @@ RESET='\033[0m'
 # Custom terminal banner
 clear
 echo -e "${BLUE}╔══════════════════════════════════════════════════════╗${RESET}"
-echo -e "${BLUE}║${WHITE}             🌐 VPS INSTALLER - HemantGamerzYT            ${BLUE}║${RESET}"
-echo -e "${BLUE}║${WHITE}        Custom Blue & White Pterodactyl Installer        ${BLUE}║${RESET}"
+echo -e "${BLUE}║${WHITE}             HemantGamerzYT                               ${BLUE}║${RESET}"
+echo -e "${BLUE}║${WHITE}    HemantGamerzYT Pterodactyl Panel Installer            ${BLUE}║${RESET}"
 echo -e "${BLUE}╚══════════════════════════════════════════════════════╝${RESET}"
 echo
 
