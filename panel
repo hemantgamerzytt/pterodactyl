@@ -3,7 +3,9 @@
 set -e
 
 ######################################################################################
-#                     HemantGamerzYT Pterodactyl Panel Installer                     #
+#                                                                                    #
+# .                       HemantGamerzYT pterodactyl Panel Installer.                #
+#                                                                                    #
 ######################################################################################
 
 export GITHUB_SOURCE="v1.2.0"
